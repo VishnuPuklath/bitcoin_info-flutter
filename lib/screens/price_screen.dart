@@ -1,3 +1,4 @@
+import 'package:bitcoin_info/components/card_coin.dart';
 import 'package:bitcoin_info/services/coin_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -11,7 +12,7 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   Map<String, String> coinValues = {};
-  bool isWaiting = false;
+  bool isWaiting = true;
 
   String selectedCurrency = 'USD';
   CoinData coinData = CoinData();
@@ -54,7 +55,7 @@ class _PriceScreenState extends State<PriceScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Bitcoin Ticker',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -85,6 +86,8 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Center(
                 child: Container(
                   child: DropdownButton<dynamic>(
+                      dropdownColor: Colors.blueGrey,
+                      style: TextStyle(color: Colors.white),
                       value: selectedCurrency,
                       items: getDropDownItems(),
                       onChanged: (value) {
@@ -97,38 +100,6 @@ class _PriceScreenState extends State<PriceScreen> {
               ),
             )
           ]),
-    );
-  }
-}
-
-class CardCoin extends StatelessWidget {
-  final String lastPrice;
-  final String selectedCurrency;
-  final String cryptoCurrency;
-
-  CardCoin(
-      {required this.lastPrice,
-      required this.selectedCurrency,
-      required this.cryptoCurrency});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Container(
-        height: 100,
-        child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 6,
-          color: Colors.blueGrey,
-          child: Center(
-              child: Text(
-            '1 $cryptoCurrency = $lastPrice $selectedCurrency',
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          )),
-        ),
-      ),
     );
   }
 }
