@@ -10,9 +10,13 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  Map<String, String> coinValues = {};
+  bool isWaiting = false;
+
   String selectedCurrency = 'USD';
   CoinData coinData = CoinData();
   String lastPrice = "";
+
   List<DropdownMenuItem> getDropDownItems() {
     List<DropdownMenuItem<String>> dropDownItems = [];
     for (String currency in currencyList) {
@@ -31,12 +35,13 @@ class _PriceScreenState extends State<PriceScreen> {
     super.initState();
   }
 
-  void getData(String selectedCurrency) async {
+  void getData() async {
+    isWaiting = true;
     try {
-      double lstPrice =
-          await coinData.getCoinData(selectedCurrency: selectedCurrency);
+      var data = await coinData.getCoinData(selectedCurrency: selectedCurrency);
+      isWaiting = false;
       setState(() {
-        lastPrice = lstPrice.toStringAsFixed(0);
+        coinValues = data;
       });
     } catch (e) {
       throw 'went wrong';
@@ -58,22 +63,21 @@ class _PriceScreenState extends State<PriceScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Container(
-                height: 100,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  elevation: 6,
-                  color: Colors.blueGrey,
-                  child: Center(
-                      child: Text(
-                    '1 BTC = $lastPrice $selectedCurrency',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  )),
-                ),
-              ),
+            Column(
+              children: [
+                CardCoin(
+                    lastPrice: isWaiting ? '?' : coinValues['BTC'].toString(),
+                    selectedCurrency: selectedCurrency,
+                    cryptoCurrency: "BTC"),
+                CardCoin(
+                    lastPrice: isWaiting ? '?' : coinValues['ETH'].toString(),
+                    selectedCurrency: selectedCurrency,
+                    cryptoCurrency: "ETH"),
+                CardCoin(
+                    lastPrice: isWaiting ? '?' : coinValues['LTC'].toString(),
+                    selectedCurrency: selectedCurrency,
+                    cryptoCurrency: "LTC"),
+              ],
             ),
             Container(
               color: Colors.blueGrey,
@@ -84,7 +88,7 @@ class _PriceScreenState extends State<PriceScreen> {
                       value: selectedCurrency,
                       items: getDropDownItems(),
                       onChanged: (value) {
-                        getData(value);
+                        getData();
                         setState(() {
                           selectedCurrency = value.toString();
                         });
@@ -93,6 +97,38 @@ class _PriceScreenState extends State<PriceScreen> {
               ),
             )
           ]),
+    );
+  }
+}
+
+class CardCoin extends StatelessWidget {
+  final String lastPrice;
+  final String selectedCurrency;
+  final String cryptoCurrency;
+
+  CardCoin(
+      {required this.lastPrice,
+      required this.selectedCurrency,
+      required this.cryptoCurrency});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Container(
+        height: 100,
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          elevation: 6,
+          color: Colors.blueGrey,
+          child: Center(
+              child: Text(
+            '1 $cryptoCurrency = $lastPrice $selectedCurrency',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          )),
+        ),
+      ),
     );
   }
 }
